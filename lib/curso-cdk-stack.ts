@@ -3,6 +3,7 @@ import { Construct } from "constructs";
 import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as sns from "aws-cdk-lib/aws-sns";
 
 export class CursoCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -47,6 +48,19 @@ export class CursoCdkStack extends cdk.Stack {
       indexName: "curso-cdk-index-2",
       partitionKey: { name: "email", type: dynamodb.AttributeType.STRING },
       projectionType: dynamodb.ProjectionType.ALL,
+    });
+
+    new sns.Topic(this, "CursoCdkTopico", {
+      topicName: "curso-cdk-topico",
+      displayName: "Curso CDK Topico de Teste",
+      fifo: false,
+    });
+
+    new sns.Topic(this, "CursoCdkTopicoFifo", {
+      topicName: "curso-cdk-topico-fifo",
+      displayName: "Curso CDK Topico de Teste Fifo",
+      fifo: true,
+      contentBasedDeduplication: true,
     });
   }
 }
