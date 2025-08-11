@@ -9,14 +9,6 @@ export class CursoCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const queue = new sqs.Queue(this, "CursoCdkQueue", {
-      visibilityTimeout: cdk.Duration.seconds(300),
-    });
-
-    const queue2 = new sqs.Queue(this, "CursoCdkQueue2", {
-      visibilityTimeout: cdk.Duration.seconds(300),
-    });
-
     new s3.Bucket(this, "CursoCdkBucket", {
       bucketName: "curso-cdk-123",
       autoDeleteObjects: true,
@@ -61,6 +53,35 @@ export class CursoCdkStack extends cdk.Stack {
       displayName: "Curso CDK Topico de Teste Fifo",
       fifo: true,
       contentBasedDeduplication: true,
+    });
+
+    const queueDlq = new sqs.Queue(this, "CursoCdkQueueDlq", {
+      visibilityTimeout: cdk.Duration.seconds(300),
+      fifo: false,
+      queueName: "curso-cdk-queue-dlq",
+      encryption: sqs.QueueEncryption.SQS_MANAGED,
+    });
+
+    new sqs.Queue(this, "CursoCdkQueue", {
+      visibilityTimeout: cdk.Duration.seconds(300),
+      fifo: false,
+      queueName: "curso-cdk-queue",
+      encryption: sqs.QueueEncryption.SQS_MANAGED,
+      deadLetterQueue: {
+        maxReceiveCount: 2,
+        queue: queueDlq,
+      },
+    });
+
+    new sqs.Queue(this, "CursoCdkQueueFifo", {
+      visibilityTimeout: cdk.Duration.seconds(300),
+      fifo: true,
+      queueName: "curso-cdk-queue.fifo",
+      encryption: sqs.QueueEncryption.SQS_MANAGED,
+      contentBasedDeduplication: true,
+      maxMessageSizeBytes: 20000,
+      retentionPeriod: cdk.Duration.days(1),
+      receiveMessageWaitTime: cdk.Duration.seconds(20),
     });
   }
 }
