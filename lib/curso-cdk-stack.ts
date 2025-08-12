@@ -85,7 +85,7 @@ export class CursoCdkStack extends cdk.Stack {
       receiveMessageWaitTime: cdk.Duration.seconds(20),
     });
 
-    new ec2.Vpc(this, "CursoCdkVpc", {
+    const vpc = new ec2.Vpc(this, "CursoCdkVpc", {
       vpcName: "curso-cdk-vpc",
       maxAzs: 3,
       ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
@@ -117,6 +117,19 @@ export class CursoCdkStack extends cdk.Stack {
           service: ec2.GatewayVpcEndpointAwsService.DYNAMODB,
           subnets: [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }],
         },
+      },
+    });
+
+    new ec2.Instance(this, "CursoCdkInstance", {
+      instanceName: "instancia-curso-cdk",
+      instanceType: ec2.InstanceType.of(
+        ec2.InstanceClass.T3,
+        ec2.InstanceSize.NANO
+      ),
+      machineImage: ec2.MachineImage.latestAmazonLinux2023(),
+      vpc: vpc,
+      vpcSubnets: {
+        subnets: vpc.publicSubnets,
       },
     });
   }

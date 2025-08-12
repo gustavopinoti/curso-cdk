@@ -3,5 +3,10 @@
     34635,
     34635,
     34892
+  ],
+  "availability-zones:account=870140859659:region=us-east-2": [
+    "us-east-2a",
+    "us-east-2b",
+    "us-east-2c"
   ]
 }
