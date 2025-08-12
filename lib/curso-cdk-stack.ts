@@ -4,6 +4,7 @@ import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as sns from "aws-cdk-lib/aws-sns";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 
 export class CursoCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -82,6 +83,41 @@ export class CursoCdkStack extends cdk.Stack {
       maxMessageSizeBytes: 20000,
       retentionPeriod: cdk.Duration.days(1),
       receiveMessageWaitTime: cdk.Duration.seconds(20),
+    });
+
+    new ec2.Vpc(this, "CursoCdkVpc", {
+      vpcName: "curso-cdk-vpc",
+      maxAzs: 3,
+      ipAddresses: ec2.IpAddresses.cidr("10.0.0.0/16"),
+      subnetConfiguration: [
+        {
+          name: "public-subnet",
+          subnetType: ec2.SubnetType.PUBLIC,
+          cidrMask: 24,
+        },
+        {
+          name: "private-subnet",
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+          cidrMask: 24,
+        },
+        {
+          name: "isolated-subnet",
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
+          cidrMask: 24,
+        },
+      ],
+      natGateways: 1,
+      createInternetGateway: true,
+      gatewayEndpoints: {
+        S3Endpoint: {
+          service: ec2.GatewayVpcEndpointAwsService.S3,
+          subnets: [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }],
+        },
+        DynamoDbEndpoint: {
+          service: ec2.GatewayVpcEndpointAwsService.DYNAMODB,
+          subnets: [{ subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }],
+        },
+      },
     });
   }
 }
