@@ -16,11 +16,11 @@ export class StorageStack extends cdk.Stack {
 
     const { vpc } = props;
 
-    new BucketConstruct(this, "CursoCdkBucketConstruct", {
+    new BucketConstruct(this, {
       bucketName: "curso-cdk-123",
     });
 
-    new DynamodbTableConstruct(this, "CursoCdkTable", {
+    new DynamodbTableConstruct(this, {
       tableName: "curso-cdk-teste",
       sortKey: { name: "data", type: dynamodb.AttributeType.STRING },
       globalSecondaryIndexes: [

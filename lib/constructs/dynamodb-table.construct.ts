@@ -10,10 +10,10 @@ export interface DynamodbTableConstructProps {
 }
 
 export class DynamodbTableConstruct extends Construct {
-  constructor(scope: Stack, id: string, props: DynamodbTableConstructProps) {
-    super(scope, id);
-
+  constructor(scope: Stack, props: DynamodbTableConstructProps) {
     const { tableName, sortKey, globalSecondaryIndexes } = props;
+
+    super(scope, `${tableName}-construct`);
 
     new dynamodb.TableV2(scope, tableName, {
       tableName,

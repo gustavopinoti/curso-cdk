@@ -2,6 +2,7 @@
 import * as cdk from "aws-cdk-lib";
 import { NetworkStack } from "../lib/network-stack";
 import { StorageStack } from "../lib/storage-stack";
+import { MessagingStack } from "../lib/messaging-cdk-stack";
 
 const app = new cdk.App();
 
@@ -18,4 +19,8 @@ const networkStack = new NetworkStack(app, "NetworkStack", {
 new StorageStack(app, "StorageStack", {
   env,
   vpc: networkStack.vpc,
+});
+
+new MessagingStack(app, "MessagingStack", {
+  env,
 });

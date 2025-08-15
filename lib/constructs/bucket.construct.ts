@@ -8,10 +8,9 @@ export interface BucketConstructProps {
 }
 
 export class BucketConstruct extends Construct {
-  constructor(scope: Stack, id: string, props: BucketConstructProps) {
-    super(scope, id);
-
+  constructor(scope: Stack, props: BucketConstructProps) {
     const { bucketName } = props;
+    super(scope, `${bucketName}-construct`);
 
     new s3.Bucket(scope, bucketName, {
       bucketName,
