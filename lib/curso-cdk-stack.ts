@@ -1,11 +1,11 @@
 import * as cdk from "aws-cdk-lib";
-import { Construct } from "constructs";
-import * as sqs from "aws-cdk-lib/aws-sqs";
-import * as s3 from "aws-cdk-lib/aws-s3";
 import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import * as sns from "aws-cdk-lib/aws-sns";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
+import * as s3 from "aws-cdk-lib/aws-s3";
+import * as sns from "aws-cdk-lib/aws-sns";
+import * as sqs from "aws-cdk-lib/aws-sqs";
+import { Construct } from "constructs";
 
 export class CursoCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
