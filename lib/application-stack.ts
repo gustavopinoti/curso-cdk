@@ -7,6 +7,7 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as sns from "aws-cdk-lib/aws-sns";
 import {
+  DynamoEventSource,
   S3EventSourceV2,
   SnsEventSource,
   SqsEventSource,
@@ -29,10 +30,15 @@ export class ApplicationStack extends cdk.Stack {
       "curso-cdk-123"
     );
 
-    const cursoCdkTestTable = dynamodb.Table.fromTableName(
+    const cursoCdkTestTable = dynamodb.Table.fromTableAttributes(
       this,
       "curso-cdk-teste-table",
-      "curso-cdk-teste"
+      {
+        tableName: "curso-cdk-teste",
+        tableStreamArn: cdk.Fn.importValue(
+          `StorageStack::table-stream::curso-cdk-teste`
+        ),
+      }
     );
 
     const cursoTopic = sns.Topic.fromTopicArn(
@@ -139,6 +145,19 @@ export class ApplicationStack extends cdk.Stack {
       new S3EventSourceV2(cursoCdk123Bucket, {
         events: [s3.EventType.OBJECT_CREATED],
         filters: [{ prefix: "uploads/", suffix: ".webp" }],
+      })
+    );
+
+    const escutaDynamoDBStreamLambda = new LambdaConstruct(this, {
+      functionName: "escuta-dynamodb-stream",
+      entry: "handlers/escuta-dynamo-stream/escuta-dynamo-stream.handler.ts",
+    });
+
+    escutaDynamoDBStreamLambda.lambda.addEventSource(
+      new DynamoEventSource(cursoCdkTestTable, {
+        batchSize: 1,
+        retryAttempts: 0,
+        startingPosition: lambda.StartingPosition.LATEST,
       })
     );
   }

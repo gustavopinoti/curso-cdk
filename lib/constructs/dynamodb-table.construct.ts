@@ -15,7 +15,7 @@ export class DynamodbTableConstruct extends Construct {
 
     super(scope, `${tableName}-construct`);
 
-    new dynamodb.TableV2(scope, tableName, {
+    const table = new dynamodb.TableV2(scope, tableName, {
       tableName,
       partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
       sortKey,
@@ -27,5 +27,12 @@ export class DynamodbTableConstruct extends Construct {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableClass: dynamodb.TableClass.STANDARD,
     });
+
+    if (table.tableStreamArn) {
+      new cdk.CfnOutput(scope, `table-${tableName}-stream-output-id`, {
+        value: table.tableStreamArn,
+        exportName: `${scope.stackName}::table-stream::${tableName}`,
+      });
+    }
   }
 }
