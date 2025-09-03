@@ -10,6 +10,7 @@ import {
   SnsEventSource,
   SqsEventSource,
 } from "aws-cdk-lib/aws-lambda-event-sources";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 
 interface ApplicationStackProps extends cdk.StackProps {
   // vpc: ec2.Vpc;
@@ -91,13 +92,41 @@ export class ApplicationStack extends cdk.Stack {
       entry: "handlers/escuta-topico/escuta-topico.handler.ts",
     });
 
-    escutaTopicoLambda.lambda.addEventSource(new SnsEventSource(cursoTopic));
+    escutaTopicoLambda.lambda.addEventSource(
+      new SnsEventSource(cursoTopic, {
+        filterPolicyWithMessageBody: {
+          type: sns.FilterOrPolicy.filter(
+            sns.SubscriptionFilter.stringFilter({
+              matchPrefixes: ["item-"],
+            })
+          ),
+        },
+        // filterPolicy: {
+        //   versao: sns.SubscriptionFilter.stringFilter({
+        //     allowlist: ["1", "2"],
+        //   }),
+        // },
+      })
+    );
 
     const escutaFilaLambda = new LambdaConstruct(this, {
       functionName: "escuta-fila",
       entry: "handlers/escuta-fila/escuta-fila.handler.ts",
     });
 
-    escutaFilaLambda.lambda.addEventSource(new SqsEventSource(cursoQueue));
+    escutaFilaLambda.lambda.addEventSource(
+      new SqsEventSource(cursoQueue, {
+        batchSize: 10,
+        maxBatchingWindow: cdk.Duration.minutes(2),
+        maxConcurrency: 2,
+        filters: [
+          lambda.FilterCriteria.filter({
+            body: {
+              status: lambda.FilterRule.isEqual("ativo"),
+            },
+          }),
+        ],
+      })
+    );
   }
 }
