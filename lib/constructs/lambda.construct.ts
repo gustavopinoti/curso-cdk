@@ -15,11 +15,13 @@ import {
 import { Construct } from "constructs";
 import * as path from "path";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 
 export interface LambdaConstructProps {
   functionName: string;
   entry: string;
   buckets?: s3.IBucket[];
+  tables?: dynamodb.ITable[];
 }
 
 export class LambdaConstruct extends Construct {
@@ -27,7 +29,7 @@ export class LambdaConstruct extends Construct {
   constructor(scope: Stack, private readonly props: LambdaConstructProps) {
     super(scope, `${props.functionName}LambdaConstruct`);
 
-    const { functionName, entry, buckets = [] } = this.props;
+    const { functionName, entry, buckets = [], tables = [] } = this.props;
 
     this.lambda = new NodejsFunction(this, `${functionName}-lambda-function`, {
       functionName,
@@ -53,6 +55,10 @@ export class LambdaConstruct extends Construct {
 
     for (const bucket of buckets) {
       bucket.grantReadWrite(this.lambda);
+    }
+
+    for (const table of tables) {
+      table.grantReadWriteData(this.lambda);
     }
   }
 }
