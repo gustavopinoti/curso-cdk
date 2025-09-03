@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { Construct } from "constructs";
+import { LambdaConstruct } from "./constructs/lambda.construct";
 
 interface ApplicationStackProps extends cdk.StackProps {
   vpc: ec2.Vpc;
@@ -23,6 +24,11 @@ export class ApplicationStack extends cdk.Stack {
       vpcSubnets: {
         subnets: vpc.publicSubnets,
       },
+    });
+
+    new LambdaConstruct(this, {
+      functionName: "primeiro-lambda",
+      entry: "handlers/primeiro-lambda/primeiro-lambda.handler.ts",
     });
   }
 }
