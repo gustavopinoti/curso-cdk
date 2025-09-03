@@ -7,14 +7,14 @@ import { BucketConstruct } from "./constructs/bucket.construct";
 import { DynamodbTableConstruct } from "./constructs/dynamodb-table.construct";
 
 interface StorageStackProps extends cdk.StackProps {
-  vpc: ec2.Vpc;
+  // vpc: ec2.Vpc;
 }
 
 export class StorageStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: StorageStackProps) {
     super(scope, id, props);
 
-    const { vpc } = props;
+    // const { vpc } = props;
 
     new BucketConstruct(this, {
       bucketName: "curso-cdk-123",
@@ -37,25 +37,25 @@ export class StorageStack extends cdk.Stack {
       ],
     });
 
-    new rds.DatabaseInstance(this, "CursoCdkRds", {
-      instanceIdentifier: "curso-cdk-rds",
-      databaseName: "curso_cdk",
-      port: 3306,
-      engine: rds.DatabaseInstanceEngine.mysql({
-        version: rds.MysqlEngineVersion.VER_8_4_5,
-      }),
-      allocatedStorage: 20,
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.MICRO
-      ),
-      vpc: vpc,
-      vpcSubnets: {
-        subnets: vpc.privateSubnets,
-      },
-      multiAz: false,
-      storageType: rds.StorageType.GP2,
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-    });
+    // new rds.DatabaseInstance(this, "CursoCdkRds", {
+    //   instanceIdentifier: "curso-cdk-rds",
+    //   databaseName: "curso_cdk",
+    //   port: 3306,
+    //   engine: rds.DatabaseInstanceEngine.mysql({
+    //     version: rds.MysqlEngineVersion.VER_8_4_5,
+    //   }),
+    //   allocatedStorage: 20,
+    //   instanceType: ec2.InstanceType.of(
+    //     ec2.InstanceClass.T3,
+    //     ec2.InstanceSize.MICRO
+    //   ),
+    //   vpc: vpc,
+    //   vpcSubnets: {
+    //     subnets: vpc.privateSubnets,
+    //   },
+    //   multiAz: false,
+    //   storageType: rds.StorageType.GP2,
+    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
+    // });
   }
 }
