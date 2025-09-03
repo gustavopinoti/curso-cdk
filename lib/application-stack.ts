@@ -7,6 +7,7 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as sqs from "aws-cdk-lib/aws-sqs";
 import * as sns from "aws-cdk-lib/aws-sns";
 import {
+  S3EventSourceV2,
   SnsEventSource,
   SqsEventSource,
 } from "aws-cdk-lib/aws-lambda-event-sources";
@@ -126,6 +127,18 @@ export class ApplicationStack extends cdk.Stack {
             },
           }),
         ],
+      })
+    );
+
+    const escutaS3BucketLambda = new LambdaConstruct(this, {
+      functionName: "escuta-s3-bucket",
+      entry: "handlers/escuta-s3-bucket/escuta-s3-bucket.handler.ts",
+    });
+
+    escutaS3BucketLambda.lambda.addEventSource(
+      new S3EventSourceV2(cursoCdk123Bucket, {
+        events: [s3.EventType.OBJECT_CREATED],
+        filters: [{ prefix: "uploads/", suffix: ".webp" }],
       })
     );
   }
