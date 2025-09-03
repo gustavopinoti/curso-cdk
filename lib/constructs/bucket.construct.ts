@@ -1,7 +1,7 @@
-import { Stack } from "aws-cdk-lib";
-import { Construct } from "constructs";
 import * as cdk from "aws-cdk-lib";
+import { Stack } from "aws-cdk-lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
+import { Construct } from "constructs";
 
 export interface BucketConstructProps {
   bucketName: string;

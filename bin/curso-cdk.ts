@@ -9,18 +9,18 @@ const app = new cdk.App();
 
 const env = { account: "870140859659", region: "us-east-2" };
 
-const networkStack = new NetworkStack(app, "NetworkStack", {
-  env,
-});
+// const networkStack = new NetworkStack(app, "NetworkStack", {
+//   env,
+// });
 
 new StorageStack(app, "StorageStack", {
   env,
-  vpc: networkStack.vpc,
+  // vpc: networkStack.vpc,
 });
 
 new ApplicationStack(app, "ApplicationStack", {
   env,
-  vpc: networkStack.vpc,
+  // vpc: networkStack.vpc,
 });
 
 new MessagingStack(app, "MessagingStack", {
