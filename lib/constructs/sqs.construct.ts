@@ -10,6 +10,8 @@ export interface SqsConstructProps {
 }
 
 export class SqsConstruct extends Construct {
+  readonly queue: sqs.Queue;
+
   constructor(scope: Stack, props: SqsConstructProps) {
     const { queueName, createDlq = false, fifo = false } = props;
 
@@ -21,7 +23,7 @@ export class SqsConstruct extends Construct {
 
     super(scope, `${idFormatted}-construct`);
 
-    new sqs.Queue(this, idFormatted, {
+    this.queue = new sqs.Queue(this, idFormatted, {
       queueName: queueNameFormatted,
       fifo,
       contentBasedDeduplication: fifo ? true : undefined,
@@ -38,6 +40,11 @@ export class SqsConstruct extends Construct {
             }),
           }
         : undefined,
+    });
+
+    new cdk.CfnOutput(scope, `queue-${idFormatted}-output-id`, {
+      value: this.queue.queueArn,
+      exportName: `${scope.stackName}::queue::${idFormatted}`,
     });
   }
 }

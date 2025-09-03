@@ -18,11 +18,13 @@ new StorageStack(app, "StorageStack", {
   // vpc: networkStack.vpc,
 });
 
-new ApplicationStack(app, "ApplicationStack", {
+const messagingStack = new MessagingStack(app, "MessagingStack", {
+  env,
+});
+
+const applicationStack = new ApplicationStack(app, "ApplicationStack", {
   env,
   // vpc: networkStack.vpc,
 });
 
-new MessagingStack(app, "MessagingStack", {
-  env,
-});
+applicationStack.addDependency(messagingStack);

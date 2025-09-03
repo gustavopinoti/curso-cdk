@@ -2,12 +2,13 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import { SnsConstruct } from "./constructs/sns.construct";
 import { SqsConstruct } from "./constructs/sqs.construct";
+import { SqsSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
 
 export class MessagingStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new SnsConstruct(this, {
+    const { topic } = new SnsConstruct(this, {
       topicName: "curso-cdk-topico",
       displayName: "Curso CDK Topico de Teste",
     });
@@ -18,7 +19,7 @@ export class MessagingStack extends cdk.Stack {
       fifo: true,
     });
 
-    new SqsConstruct(this, {
+    const { queue } = new SqsConstruct(this, {
       queueName: "curso-cdk-queue",
       createDlq: true,
       fifo: false,
@@ -29,5 +30,7 @@ export class MessagingStack extends cdk.Stack {
       createDlq: true,
       fifo: true,
     });
+
+    topic.addSubscription(new SqsSubscription(queue));
   }
 }

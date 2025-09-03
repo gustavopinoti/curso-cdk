@@ -6,6 +6,7 @@ import {
   aws_lambda as lambda,
   aws_logs as logs,
   aws_sns as sns,
+  aws_sqs as sqs,
 } from "aws-cdk-lib";
 import {
   Charset,
@@ -22,6 +23,9 @@ export interface LambdaConstructProps {
   entry: string;
   buckets?: s3.IBucket[];
   tables?: dynamodb.ITable[];
+  topics?: sns.ITopic[];
+  queues?: sqs.IQueue[];
+  environmentVariables?: { [key: string]: string };
 }
 
 export class LambdaConstruct extends Construct {
@@ -29,12 +33,23 @@ export class LambdaConstruct extends Construct {
   constructor(scope: Stack, private readonly props: LambdaConstructProps) {
     super(scope, `${props.functionName}LambdaConstruct`);
 
-    const { functionName, entry, buckets = [], tables = [] } = this.props;
+    const {
+      functionName,
+      entry,
+      buckets = [],
+      tables = [],
+      topics = [],
+      queues = [],
+      environmentVariables = {},
+    } = this.props;
 
     this.lambda = new NodejsFunction(this, `${functionName}-lambda-function`, {
       functionName,
       description: `${functionName} lambda function`,
       runtime: lambda.Runtime.NODEJS_22_X,
+      environment: {
+        ...environmentVariables,
+      },
       bundling: {
         externalModules: ["@aws-sdk/*"],
         logLevel: LogLevel.SILENT,
@@ -59,6 +74,14 @@ export class LambdaConstruct extends Construct {
 
     for (const table of tables) {
       table.grantReadWriteData(this.lambda);
+    }
+
+    for (const topic of topics) {
+      topic.grantPublish(this.lambda);
+    }
+
+    for (const queue of queues) {
+      queue.grantSendMessages(this.lambda);
     }
   }
 }
