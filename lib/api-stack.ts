@@ -38,6 +38,14 @@ export class ApiStack extends cdk.Stack {
           stage: api.deploymentStage,
         },
       ],
+      throttle: {
+        rateLimit: 2,
+        burstLimit: 5,
+      },
+      quota: {
+        limit: 5,
+        period: apigateway.Period.DAY,
+      },
     });
     plan.addApiKey(apiKey);
 
