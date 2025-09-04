@@ -4,6 +4,7 @@ import { NetworkStack } from "../lib/network-stack";
 import { StorageStack } from "../lib/storage-stack";
 import { MessagingStack } from "../lib/messaging-cdk-stack";
 import { ApplicationStack } from "../lib/application-stack";
+import { ApiStack } from "../lib/api-stack";
 
 const app = new cdk.App();
 
@@ -28,3 +29,7 @@ const applicationStack = new ApplicationStack(app, "ApplicationStack", {
 });
 
 applicationStack.addDependency(messagingStack);
+
+new ApiStack(app, "ApiStack", {
+  env,
+});
