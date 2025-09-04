@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
+import { LambdaConstruct } from "./constructs/lambda.construct";
 
 interface ApiStackProps extends cdk.StackProps {}
 
@@ -22,5 +23,14 @@ export class ApiStack extends cdk.Stack {
         allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
       },
     });
+
+    const lambda = new LambdaConstruct(this, {
+      functionName: "primeira-api",
+      entry: "handlers/primeira-api/primeira-api.handler.ts",
+    }).lambda;
+
+    const helloResource = api.root.addResource("hello");
+    helloResource.addMethod("GET", new apigateway.LambdaIntegration(lambda));
+    helloResource.addMethod("POST", new apigateway.LambdaIntegration(lambda));
   }
 }
