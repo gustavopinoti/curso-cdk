@@ -30,7 +30,7 @@ export class StepFunctionStack extends cdk.Stack {
     );
 
     new stepfunctions.StateMachine(this, "curso-step-function-state-machine", {
-      definition,
+      definitionBody: stepfunctions.DefinitionBody.fromChainable(definition),
       timeout: cdk.Duration.minutes(1),
       stateMachineName: "curso-step-function",
     });
