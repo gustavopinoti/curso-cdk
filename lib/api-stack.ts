@@ -88,6 +88,15 @@ export class ApiStack extends cdk.Stack {
       }
     );
 
+    const authorizer = new apigateway.CognitoUserPoolsAuthorizer(
+      this,
+      `curso-user-pool-authorizer`,
+      {
+        cognitoUserPools: [userPool],
+        authorizerName: `curso-user-pool-authorizer`,
+      }
+    );
+
     const identityPool = new cognito.CfnIdentityPool(
       this,
       `curso-user-pool-identity-pool`,
@@ -117,6 +126,10 @@ export class ApiStack extends cdk.Stack {
         allowOrigins: apigateway.Cors.ALL_ORIGINS,
         allowMethods: apigateway.Cors.ALL_METHODS,
         allowHeaders: apigateway.Cors.DEFAULT_HEADERS,
+      },
+      defaultMethodOptions: {
+        authorizationType: apigateway.AuthorizationType.COGNITO,
+        authorizer,
       },
       apiKeySourceType: apigateway.ApiKeySourceType.HEADER,
     });
@@ -162,6 +175,8 @@ export class ApiStack extends cdk.Stack {
 
     helloResource
       .addResource("test-key")
-      .addMethod("GET", new apigateway.LambdaIntegration(lambda));
+      .addMethod("GET", new apigateway.LambdaIntegration(lambda), {
+        authorizationType: apigateway.AuthorizationType.NONE,
+      });
   }
 }
