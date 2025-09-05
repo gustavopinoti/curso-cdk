@@ -1,13 +1,83 @@
 import * as cdk from "aws-cdk-lib";
+import { Duration, RemovalPolicy } from "aws-cdk-lib";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
 import { LambdaConstruct } from "./constructs/lambda.construct";
+
+import * as cognito from "aws-cdk-lib/aws-cognito";
 
 interface ApiStackProps extends cdk.StackProps {}
 
 export class ApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
+
+    const userPool = new cognito.UserPool(this, `curso-user-pool`, {
+      userPoolName: "curso-user-pool",
+      accountRecovery: cognito.AccountRecovery.EMAIL_ONLY,
+      autoVerify: { email: true, phone: false },
+      passwordPolicy: {
+        minLength: 6,
+        requireDigits: true,
+        requireLowercase: true,
+        requireSymbols: true,
+        requireUppercase: true,
+        tempPasswordValidity: Duration.days(7),
+      },
+      removalPolicy: RemovalPolicy.DESTROY,
+      selfSignUpEnabled: true,
+      customAttributes: {
+        userId: new cognito.StringAttribute({ mutable: true }),
+      },
+      signInAliases: {
+        email: true,
+        username: false,
+      },
+      userVerification: {
+        emailSubject: "Seu código de cadastro Morada.Dev!",
+        emailStyle: cognito.VerificationEmailStyle.CODE,
+        emailBody: "Seu código de cadastro é {####}",
+      },
+      signInCaseSensitive: true,
+    });
+
+    const userPoolClient = new cognito.UserPoolClient(
+      this,
+      `curso-user-pool-client`,
+      {
+        userPool,
+        authFlows: {
+          adminUserPassword: false,
+          custom: false,
+          userPassword: true,
+          userSrp: true,
+        },
+        generateSecret: false,
+        accessTokenValidity: Duration.days(1),
+        idTokenValidity: Duration.days(1),
+        enableTokenRevocation: true,
+        preventUserExistenceErrors: true,
+        refreshTokenValidity: Duration.days(7),
+        userPoolClientName: "curso-user-pool",
+      }
+    );
+
+    const identityPool = new cognito.CfnIdentityPool(
+      this,
+      `curso-user-pool-identity-pool`,
+      {
+        allowUnauthenticatedIdentities: false,
+        allowClassicFlow: false,
+        cognitoIdentityProviders: [
+          {
+            clientId: userPoolClient.userPoolClientId,
+            providerName: userPool.userPoolProviderName,
+            serverSideTokenCheck: true,
+          },
+        ],
+        identityPoolName: `curso-user-pool-identity-pool`,
+      }
+    );
 
     const api = new apigateway.RestApi(this, "curso-api", {
       description: "API para curso de CDK",
@@ -43,7 +113,7 @@ export class ApiStack extends cdk.Stack {
         burstLimit: 5,
       },
       quota: {
-        limit: 5,
+        limit: 20,
         period: apigateway.Period.DAY,
       },
     });
