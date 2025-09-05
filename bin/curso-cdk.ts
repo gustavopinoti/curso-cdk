@@ -6,6 +6,7 @@ import { MessagingStack } from "../lib/messaging-cdk-stack";
 import { ApplicationStack } from "../lib/application-stack";
 import { ApiStack } from "../lib/api-stack";
 import { StaticWebsiteStack } from "../lib/static-website-stack";
+import { StepFunctionStack } from "../lib/step-function-stack";
 
 const app = new cdk.App();
 
@@ -36,5 +37,9 @@ new ApiStack(app, "ApiStack", {
 });
 
 new StaticWebsiteStack(app, "StaticWebsiteStack", {
+  env,
+});
+
+new StepFunctionStack(app, "StepFunctionStack", {
   env,
 });
