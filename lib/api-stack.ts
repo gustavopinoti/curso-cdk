@@ -59,6 +59,32 @@ export class ApiStack extends cdk.Stack {
         preventUserExistenceErrors: true,
         refreshTokenValidity: Duration.days(7),
         userPoolClientName: "curso-user-pool",
+        oAuth: {
+          logoutUrls: ["https://morada.dev"],
+          callbackUrls: ["https://morada.dev"],
+          flows: {
+            implicitCodeGrant: true,
+          },
+          scopes: [cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID],
+        },
+      }
+    );
+
+    userPool.addDomain("curso-user-pool-domain", {
+      cognitoDomain: {
+        domainPrefix: "curso-user-pool",
+      },
+
+      managedLoginVersion: cognito.ManagedLoginVersion.NEWER_MANAGED_LOGIN,
+    });
+
+    new cognito.CfnManagedLoginBranding(
+      this,
+      "curso-user-pool-managed-login-branding",
+      {
+        userPoolId: userPool.userPoolId,
+        clientId: userPoolClient.userPoolClientId,
+        useCognitoProvidedValues: true,
       }
     );
 
