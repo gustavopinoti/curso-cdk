@@ -1,5 +1,6 @@
 import {
   Duration,
+  RemovalPolicy,
   Stack,
   aws_iam as iam,
   aws_kms as kms,
@@ -61,6 +62,8 @@ export class LambdaConstruct extends Construct {
       logGroup: new logs.LogGroup(this, `${functionName}-log-group`, {
         retention: logs.RetentionDays.ONE_WEEK,
         logGroupName: `/aws/lambda/${functionName}`,
+        removalPolicy: RemovalPolicy.DESTROY,
+        logGroupClass: logs.LogGroupClass.STANDARD,
       }),
       timeout: Duration.seconds(30),
       entry: path.join(__dirname, `../../src/${entry}`),
