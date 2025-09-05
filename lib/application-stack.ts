@@ -169,5 +169,18 @@ export class ApplicationStack extends cdk.Stack {
       evaluationPeriods: 1,
     });
     alarm.addAlarmAction(new actions.SnsAction(cursoTopic));
+
+    const dashboard = new cloudwatch.Dashboard(this, "custom-dashboard", {
+      dashboardName: "custom-dashboard",
+    });
+
+    const alarmWidget = new cloudwatch.AlarmWidget({
+      title: "Erros do escuta Dynamo DB Lambda",
+      alarm,
+      width: 12,
+      height: 6,
+    });
+
+    dashboard.addWidgets(alarmWidget);
   }
 }
