@@ -16,6 +16,25 @@ export class StepFunctionStack extends cdk.Stack {
         "handlers/primeiro-processamento-step/primeiro-processamento-step.handler.ts",
     });
 
+    const notificaSucessoStepLambda = new LambdaConstruct(this, {
+      functionName: "notifica-sucesso-step",
+      entry: "handlers/notifica-sucesso-step/notifica-sucesso-step.handler.ts",
+    });
+
+    const processaFalhaStepLambda = new LambdaConstruct(this, {
+      functionName: "processa-falha-step",
+      entry: "handlers/processa-falha-step/processa-falha-step.handler.ts",
+    });
+
+    const jobFailed = new stepfunctions.Fail(
+      this,
+      "Curso Step Function Falhou",
+      {
+        cause: "Lambda não foi capaz de processar o evento",
+        error: "Processamento Falhou",
+      }
+    );
+
     const primeiraTask = new tasks.LambdaInvoke(
       this,
       "primeiro-processamento-step-task",
@@ -25,12 +44,39 @@ export class StepFunctionStack extends cdk.Stack {
       }
     );
 
+    const notificaSucessoTask = new tasks.LambdaInvoke(
+      this,
+      "notifica-sucesso-step-task",
+      {
+        lambdaFunction: notificaSucessoStepLambda.lambda,
+        outputPath: "$",
+      }
+    );
+
+    const processaFalhaTask = new tasks.LambdaInvoke(
+      this,
+      "processa-falha-step-task",
+      {
+        lambdaFunction: processaFalhaStepLambda.lambda,
+        outputPath: "$",
+      }
+    );
+
     const definition = primeiraTask.next(
-      new stepfunctions.Succeed(this, "Done")
+      new stepfunctions.Choice(this, "Processou com sucesso?")
+        .when(
+          stepfunctions.Condition.booleanEquals("$.Payload.sucesso", true),
+          notificaSucessoTask.next(new stepfunctions.Succeed(this, "Done"))
+        )
+        .when(
+          stepfunctions.Condition.booleanEquals("$.Payload.sucesso", false),
+          processaFalhaTask.next(jobFailed)
+        )
+        .otherwise(jobFailed)
     );
 
     new stepfunctions.StateMachine(this, "curso-step-function-state-machine", {
-      definition,
+      definitionBody: stepfunctions.DefinitionBody.fromChainable(definition),
       timeout: cdk.Duration.minutes(1),
       stateMachineName: "curso-step-function",
     });
