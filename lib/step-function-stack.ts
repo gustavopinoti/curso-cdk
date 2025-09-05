@@ -62,7 +62,7 @@ export class StepFunctionStack extends cdk.Stack {
       }
     );
 
-    const definition = primeiraTask.next(
+    const definition = primeiraTask.addCatch(jobFailed).next(
       new stepfunctions.Choice(this, "Processou com sucesso?")
         .when(
           stepfunctions.Condition.booleanEquals("$.Payload.sucesso", true),
@@ -76,7 +76,7 @@ export class StepFunctionStack extends cdk.Stack {
     );
 
     new stepfunctions.StateMachine(this, "curso-step-function-state-machine", {
-      definition,
+      definitionBody: stepfunctions.DefinitionBody.fromChainable(definition),
       timeout: cdk.Duration.minutes(1),
       stateMachineName: "curso-step-function",
     });
