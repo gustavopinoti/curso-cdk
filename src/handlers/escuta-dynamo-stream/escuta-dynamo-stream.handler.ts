@@ -6,4 +6,6 @@ export async function handler(event: DynamoDBStreamEvent): Promise<void> {
     `Evento: ${event.Records[0].eventName}`,
     event.Records[0].dynamodb
   );
+
+  throw new Error("Generic Error");
 }

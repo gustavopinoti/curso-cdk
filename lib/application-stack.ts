@@ -1,18 +1,20 @@
 import * as cdk from "aws-cdk-lib";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
+import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as s3 from "aws-cdk-lib/aws-s3";
+import * as sns from "aws-cdk-lib/aws-sns";
+import * as sqs from "aws-cdk-lib/aws-sqs";
 import { Construct } from "constructs";
 import { LambdaConstruct } from "./constructs/lambda.construct";
-import * as s3 from "aws-cdk-lib/aws-s3";
-import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
-import * as sqs from "aws-cdk-lib/aws-sqs";
-import * as sns from "aws-cdk-lib/aws-sns";
+
+import * as actions from "aws-cdk-lib/aws-cloudwatch-actions";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 import {
   DynamoEventSource,
   S3EventSourceV2,
   SnsEventSource,
   SqsEventSource,
 } from "aws-cdk-lib/aws-lambda-event-sources";
-import * as lambda from "aws-cdk-lib/aws-lambda";
 
 interface ApplicationStackProps extends cdk.StackProps {
   // vpc: ec2.Vpc;
@@ -101,13 +103,13 @@ export class ApplicationStack extends cdk.Stack {
 
     escutaTopicoLambda.lambda.addEventSource(
       new SnsEventSource(cursoTopic, {
-        filterPolicyWithMessageBody: {
-          type: sns.FilterOrPolicy.filter(
-            sns.SubscriptionFilter.stringFilter({
-              matchPrefixes: ["item-"],
-            })
-          ),
-        },
+        // filterPolicyWithMessageBody: {
+        //   type: sns.FilterOrPolicy.filter(
+        //     sns.SubscriptionFilter.stringFilter({
+        //       matchPrefixes: ["item-"],
+        //     })
+        //   ),
+        // },
         // filterPolicy: {
         //   versao: sns.SubscriptionFilter.stringFilter({
         //     allowlist: ["1", "2"],
@@ -160,5 +162,12 @@ export class ApplicationStack extends cdk.Stack {
         startingPosition: lambda.StartingPosition.LATEST,
       })
     );
+
+    const alarm = new cloudwatch.Alarm(this, "escuta-dynamo-alarm", {
+      metric: escutaDynamoDBStreamLambda.lambda.metricErrors(),
+      threshold: 1,
+      evaluationPeriods: 1,
+    });
+    alarm.addAlarmAction(new actions.SnsAction(cursoTopic));
   }
 }
