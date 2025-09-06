@@ -5,10 +5,11 @@ import { Construct } from "constructs";
 import { LambdaConstruct } from "./constructs/lambda.construct";
 
 import * as cognito from "aws-cdk-lib/aws-cognito";
+import { CustomStack } from "./custom-stack";
 
 interface ApiStackProps extends cdk.StackProps {}
 
-export class ApiStack extends cdk.Stack {
+export class ApiStack extends CustomStack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 

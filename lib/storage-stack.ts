@@ -5,12 +5,13 @@ import * as rds from "aws-cdk-lib/aws-rds";
 import { Construct } from "constructs";
 import { BucketConstruct } from "./constructs/bucket.construct";
 import { DynamodbTableConstruct } from "./constructs/dynamodb-table.construct";
+import { CustomStack } from "./custom-stack";
 
 interface StorageStackProps extends cdk.StackProps {
   // vpc: ec2.Vpc;
 }
 
-export class StorageStack extends cdk.Stack {
+export class StorageStack extends CustomStack {
   constructor(scope: Construct, id: string, props: StorageStackProps) {
     super(scope, id, props);
 

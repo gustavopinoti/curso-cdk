@@ -1,23 +1,21 @@
 import {
   Duration,
   RemovalPolicy,
-  Stack,
-  aws_iam as iam,
-  aws_kms as kms,
   aws_lambda as lambda,
   aws_logs as logs,
   aws_sns as sns,
   aws_sqs as sqs,
 } from "aws-cdk-lib";
+import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import {
   Charset,
   LogLevel,
   NodejsFunction,
 } from "aws-cdk-lib/aws-lambda-nodejs";
+import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 import * as path from "path";
-import * as s3 from "aws-cdk-lib/aws-s3";
-import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import { CustomStack } from "../custom-stack";
 
 export interface LambdaConstructProps {
   functionName: string;
@@ -31,8 +29,13 @@ export interface LambdaConstructProps {
 
 export class LambdaConstruct extends Construct {
   readonly lambda: NodejsFunction;
-  constructor(scope: Stack, private readonly props: LambdaConstructProps) {
+  constructor(
+    scope: CustomStack,
+    private readonly props: LambdaConstructProps
+  ) {
     super(scope, `${props.functionName}LambdaConstruct`);
+
+    const { logRetention } = scope.env;
 
     const {
       functionName,
@@ -60,7 +63,7 @@ export class LambdaConstruct extends Construct {
         target: "es2023",
       },
       logGroup: new logs.LogGroup(this, `${functionName}-log-group`, {
-        retention: logs.RetentionDays.ONE_WEEK,
+        retention: logRetention,
         logGroupName: `/aws/lambda/${functionName}`,
         removalPolicy: RemovalPolicy.DESTROY,
         logGroupClass: logs.LogGroupClass.STANDARD,

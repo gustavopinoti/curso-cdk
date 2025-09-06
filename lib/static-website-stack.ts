@@ -5,10 +5,11 @@ import { Construct } from "constructs";
 import * as s3Deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as cloudfrontorigins from "aws-cdk-lib/aws-cloudfront-origins";
+import { CustomStack } from "./custom-stack";
 
 interface StaticWebsiteStackProps extends cdk.StackProps {}
 
-export class StaticWebsiteStack extends cdk.Stack {
+export class StaticWebsiteStack extends CustomStack {
   constructor(scope: Construct, id: string, props: StaticWebsiteStackProps) {
     super(scope, id, props);
 

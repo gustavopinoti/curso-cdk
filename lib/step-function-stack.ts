@@ -3,10 +3,11 @@ import { Construct } from "constructs";
 import * as stepfunctions from "aws-cdk-lib/aws-stepfunctions";
 import * as tasks from "aws-cdk-lib/aws-stepfunctions-tasks";
 import { LambdaConstruct } from "./constructs/lambda.construct";
+import { CustomStack } from "./custom-stack";
 
 interface StepFunctionStackProps extends cdk.StackProps {}
 
-export class StepFunctionStack extends cdk.Stack {
+export class StepFunctionStack extends CustomStack {
   constructor(scope: Construct, id: string, props: StepFunctionStackProps) {
     super(scope, id, props);
 

@@ -1,8 +1,9 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as codeartifact from "aws-cdk-lib/aws-codeartifact";
+import { CustomStack } from "./custom-stack";
 
-export class CodeArtifactStack extends cdk.Stack {
+export class CodeArtifactStack extends CustomStack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 

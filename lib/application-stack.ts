@@ -15,12 +15,13 @@ import {
   SnsEventSource,
   SqsEventSource,
 } from "aws-cdk-lib/aws-lambda-event-sources";
+import { CustomStack } from "./custom-stack";
 
 interface ApplicationStackProps extends cdk.StackProps {
   // vpc: ec2.Vpc;
 }
 
-export class ApplicationStack extends cdk.Stack {
+export class ApplicationStack extends CustomStack {
   constructor(scope: Construct, id: string, props: ApplicationStackProps) {
     super(scope, id, props);
 

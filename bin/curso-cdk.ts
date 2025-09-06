@@ -8,10 +8,11 @@ import { ApiStack } from "../lib/api-stack";
 import { StaticWebsiteStack } from "../lib/static-website-stack";
 import { StepFunctionStack } from "../lib/step-function-stack";
 import { CodeArtifactStack } from "../lib/code-artifact-stack";
+import { getEnvironment } from "../lib/environments/environment.helper";
 
 const app = new cdk.App();
 
-const env = { account: "870140859659", region: "us-east-2" };
+const env = getEnvironment();
 
 // const networkStack = new NetworkStack(app, "NetworkStack", {
 //   env,
@@ -28,6 +29,7 @@ const messagingStack = new MessagingStack(app, "MessagingStack", {
 
 const applicationStack = new ApplicationStack(app, "ApplicationStack", {
   env,
+
   // vpc: networkStack.vpc,
 });
 
