@@ -1,8 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { SnsConstruct } from "./constructs/sns.construct";
-import { SqsConstruct } from "./constructs/sqs.construct";
 import { SqsSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
+import { SnsConstruct, SqsConstruct } from "@curso-cdk/constructs-cdk";
 
 export class MessagingStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
