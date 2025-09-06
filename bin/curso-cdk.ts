@@ -7,6 +7,7 @@ import { ApplicationStack } from "../lib/application-stack";
 import { ApiStack } from "../lib/api-stack";
 import { StaticWebsiteStack } from "../lib/static-website-stack";
 import { StepFunctionStack } from "../lib/step-function-stack";
+import { CodeArtifactStack } from "../lib/code-artifact-stack";
 
 const app = new cdk.App();
 
@@ -41,5 +42,9 @@ new StaticWebsiteStack(app, "StaticWebsiteStack", {
 });
 
 new StepFunctionStack(app, "StepFunctionStack", {
+  env,
+});
+
+new CodeArtifactStack(app, "CodeArtifactStack", {
   env,
 });
