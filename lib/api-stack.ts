@@ -32,5 +32,8 @@ export class ApiStack extends cdk.Stack {
     const helloResource = api.root.addResource("hello");
     helloResource.addMethod("GET", new apigateway.LambdaIntegration(lambda));
     helloResource.addMethod("POST", new apigateway.LambdaIntegration(lambda));
+
+    const variavelResource = api.root.addResource("{variavel}");
+    variavelResource.addMethod("GET", new apigateway.LambdaIntegration(lambda));
   }
 }
